@@ -145,6 +145,37 @@ func TestLoadConfig_ParsesTokenInsecureSkipVerify(t *testing.T) {
 	}
 }
 
+func TestServerLoadConfig_Postgres_DefaultSSLModeRequire(t *testing.T) {
+	setBaseConfigEnv(t)
+	setRequiredNSWOAuth2Env(t)
+	setRequiredAuthEnv(t)
+	t.Setenv("DB_DRIVER", "postgres")
+	t.Setenv("DB_PASSWORD", "secret")
+	t.Setenv("DB_SSLMODE", "")
+
+	cfg, err := LoadConfig()
+	if err != nil {
+		t.Fatalf("expected no error, got %v", err)
+	}
+	if cfg.DB.Postgres.SSLMode != "require" {
+		t.Errorf("DB.Postgres.SSLMode = %q, want require when unset", cfg.DB.Postgres.SSLMode)
+	}
+}
+
+func TestLoadConfig_RejectsDBSSLModeDisableOutsideDev(t *testing.T) {
+	t.Setenv("DB_DRIVER", "postgres")
+	t.Setenv("DB_SSLMODE", "disable")
+	t.Setenv("APP_ENV", "production") // Or unset, acting as production
+
+	_, err := LoadConfig()
+	if err == nil {
+		t.Fatal("expected an error when DB_SSLMODE=disable outside development, but got nil")
+	}
+	if !strings.Contains(err.Error(), "DB_SSLMODE=disable") {
+		t.Errorf("expected error to mention DB_SSLMODE=disable, got: %v", err)
+	}
+}
+
 func TestLoadConfig_RejectsInvalidTokenInsecureSkipVerify(t *testing.T) {
 	setBaseConfigEnv(t)
 	setRequiredNSWOAuth2Env(t)

@@ -47,7 +47,7 @@ func LoadConfig() (Config, error) {
 				User:     envOrDefault("DB_USER", "postgres"),
 				Password: os.Getenv("DB_PASSWORD"),
 				Name:     envOrDefault("DB_NAME", "nsw_agency_db"),
-				SSLMode:  envOrDefault("DB_SSLMODE", "disable"),
+				SSLMode:  envOrDefault("DB_SSLMODE", "require"),
 			},
 		},
 		ArtifactLoader: loaders.Config{
@@ -132,7 +132,9 @@ func LoadConfig() (Config, error) {
 		return Config{}, fmt.Errorf("AUTH_JWKS_INSECURE_SKIP_VERIFY: insecure TLS verification requested but APP_ENV is not \"development\" (unset or any other value is treated as production); refusing to start — provide a trusted certificate chain, or set APP_ENV=development for a non-production run")
 	}
 	cfg.Auth.InsecureSkipTLSVerify = authInsecureSkipTLSVerify
-
+	if cfg.DB.Driver == "postgres" && cfg.DB.Postgres.SSLMode == "disable" && !isDevEnvironment() {
+		return Config{}, fmt.Errorf("DB_SSLMODE=disable: insecure database connection requested but APP_ENV is not \"development\" (unset or any other value is treated as production); refusing to start — use a secure SSL mode like \"require\", or set APP_ENV=development for a non-production run")
+	}
 	if err := cfg.ArtifactLoader.Validate(); err != nil {
 		return Config{}, err
 	}
