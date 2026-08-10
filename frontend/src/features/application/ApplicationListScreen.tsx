@@ -6,12 +6,16 @@ import { formatDateForTable } from '@/utils/date'
 import { useApplicationList } from './hooks/useApplicationList'
 
 export function ApplicationListScreen() {
+  const { consignmentId } = useParams<{ consignmentId: string }>()
+  return <ApplicationListContent key={consignmentId} consignmentId={consignmentId} />
+}
+
+function ApplicationListContent({ consignmentId }: { consignmentId: string | undefined }) {
   const { t } = useTranslation()
   const navigate = useNavigate()
-  const { consignmentId } = useParams<{ consignmentId: string }>()
-  const { data, status, pagination } = useApplicationList(consignmentId)
+  const { data, status, pagination, refetch } = useApplicationList(consignmentId)
 
-  if (status.loading && pagination.page === 1) {
+  if (status.loading) {
     return (
       <div className="flex items-center justify-center py-12">
         <Spinner size="3" />
@@ -48,7 +52,16 @@ export function ApplicationListScreen() {
       </div>
 
       <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-        {pagination.total === 0 ? (
+        {status.error ? (
+          <div className="p-12 text-center">
+            <Text size="3" color="red" weight="medium" className="block mb-4">
+              {t('consignments.tasks.error')}
+            </Text>
+            <Button variant="soft" color="red" onClick={refetch}>
+              {t('consignments.tasks.retryButton')}
+            </Button>
+          </div>
+        ) : pagination.total === 0 ? (
           <div className="p-12 text-center">
             <div className="bg-white w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 shadow-sm border border-gray-100">
               <ArchiveIcon className="w-8 h-8 text-gray-300" />
