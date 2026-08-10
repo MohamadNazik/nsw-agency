@@ -7,7 +7,7 @@ export default mergeConfig(
     test: {
       environment: 'jsdom',
       setupFiles: ['./src/test/setup.ts'],
-      globals: true,
+      globals: false,
       coverage: {
         provider: 'v8',
         reporter: ['text', 'lcov'],

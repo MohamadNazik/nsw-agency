@@ -1,3 +1,5 @@
+import { describe, it, expect } from 'vitest'
+
 describe('test environment', () => {
   it('has jsdom document available', () => {
     expect(document).toBeDefined()
