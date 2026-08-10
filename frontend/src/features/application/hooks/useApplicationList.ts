@@ -6,7 +6,7 @@ const PAGE_SIZE = 20
 
 export function useApplicationList(consignmentId: string | undefined) {
   const [applications, setApplications] = useState<AgencyApplication[]>([])
-  const [loading, setLoading] = useState(true)
+  const [loading, setLoading] = useState(!!consignmentId)
   const [page, setPage] = useState(1)
   const [total, setTotal] = useState(0)
 
@@ -16,7 +16,7 @@ export function useApplicationList(consignmentId: string | undefined) {
     setPage(1)
     setApplications([])
     setTotal(0)
-    setLoading(true)
+    setLoading(!!consignmentId)
   }
 
   const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE))

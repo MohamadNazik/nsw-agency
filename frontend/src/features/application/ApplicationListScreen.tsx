@@ -3,17 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom'
 import { Badge, Text, Spinner, IconButton, Button, Flex } from '@radix-ui/themes'
 import { ChevronLeftIcon, ChevronRightIcon, ArrowLeftIcon, ArchiveIcon } from '@radix-ui/react-icons'
 import { formatDateForTable } from '@/utils/date'
-import i18n from '@/i18n'
 import { useApplicationList } from './hooks/useApplicationList'
-
-const formatDateForTable = (dateString?: string) => {
-  if (!dateString) return '-'
-  return new Date(dateString).toLocaleDateString(i18n.resolvedLanguage || undefined, {
-    month: 'short',
-    day: 'numeric',
-    year: 'numeric',
-  })
-}
 
 export function ApplicationListScreen() {
   const { t } = useTranslation()
